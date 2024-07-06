@@ -9,10 +9,12 @@ import {
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { provider } from "../utils/firebase";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const navigate = useNavigate();
 
   const name = useRef();
   const email = useRef();
@@ -83,6 +85,7 @@ const Login = () => {
           console.log(user);
           // IdP data available using getAdditionalUserInfo(result)
           // ...
+          navigate("/browse");
         })
         .catch((error) => {
           // Handle Errors here.
@@ -96,6 +99,7 @@ const Login = () => {
           const credential = GoogleAuthProvider.credentialFromError(error);
           console.log(credential);
           // ...
+          navigate("/");
         });
     }
   };
