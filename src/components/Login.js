@@ -5,7 +5,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { provider } from "../utils/firebase";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -15,42 +18,84 @@ const Login = () => {
   const email = useRef();
   const password = useRef();
 
-  const handleSignIn = () => {
-    const errorMessage = validate(
+  //Thiss method will work if in firebase we provided signin method as email/password
+
+  // const handleSignIn = () => {
+  //   const errorMessage = validate(
+  //     email?.current?.value,
+  //     password?.current?.value,
+  //     name?.current?.value
+  //   );
+  //   setErrorMessage(errorMessage);
+  //   if (errorMessage) return;
+
+  //   if (isSignIn) {
+  //     createUserWithEmailAndPassword(
+  //       auth,
+  //       email?.current?.value,
+  //       password?.current?.value
+  //     )
+  //       .then((userCredential) => {
+  //         // Signed up
+  //         const user = userCredential.user;
+  //         console.log(user);
+  //       })
+  //       .catch((error) => {
+  //         const errorCode = error.code;
+  //         const errorMessage = error.message;
+  //         setErrorMessage(errorCode - errorMessage);
+  //       });
+  //   } else {
+  //     signInWithEmailAndPassword(auth, email, password)
+  //       .then((userCredential) => {
+  //         // Signed in
+  //         const user = userCredential.user;
+  //         console.log(user);
+  //       })
+  //       .catch((error) => {
+  //         const errorCode = error.code;
+  //         const errorMessage = error.message;
+  //         setErrorMessage(errorCode + " " + errorMessage);
+  //       });
+  //   }
+  // };
+
+  //Sigin method by google
+
+  const handleAuth = () => {
+    const message = validate(
       email?.current?.value,
       password?.current?.value,
       name?.current?.value
     );
-    setErrorMessage(errorMessage);
-    if (errorMessage) return;
+    setErrorMessage(message);
+    if (message) return;
 
-    if (isSignIn) {
-      createUserWithEmailAndPassword(
-        auth,
-        email?.current?.value,
-        password?.current?.value
-      )
-        .then((userCredential) => {
-          // Signed up
-          const user = userCredential.user;
+    if (message === null) {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          console.log(token);
+          // The signed-in user info.
+          const user = result.user;
           console.log(user);
+          // IdP data available using getAdditionalUserInfo(result)
+          // ...
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorMessage(errorCode - errorMessage);
-        });
-    } else {
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          console.log(user);
-        })
-        .catch((error) => {
+          // Handle Errors here.
           const errorCode = error.code;
           const errorMessage = error.message;
           setErrorMessage(errorCode + " " + errorMessage);
+          // The email of the user's account used.
+          const email = error.customData.email;
+          console.log(email);
+          // The AuthCredential type that was used.
+          const credential = GoogleAuthProvider.credentialFromError(error);
+          console.log(credential);
+          // ...
         });
     }
   };
@@ -95,7 +140,7 @@ const Login = () => {
         />
         <p className="text-red-500">{errorMessage}</p>
         <button
-          onClick={handleSignIn}
+          onClick={handleAuth}
           className="p-4 my-6 bg-red-900 w-full rounded-lg"
         >
           {isSignIn ? "Sign In" : "Sign Up"}
