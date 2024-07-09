@@ -9,7 +9,7 @@ import { validate } from "../utils/validate";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { provider } from "../utils/firebase";
-
+import { BACKGROUND_IMAGE } from "../utils/constants";
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -109,10 +109,7 @@ const Login = () => {
     <div>
       <Header />
       <div className="absolute">
-        <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/335ddde7-3955-499c-b4cc-ca2eb7e1ae71/a7d20bc1-831c-4f9d-8153-11bdf7a08d23/IN-en-20240624-POP_SIGNUP_TWO_WEEKS-perspective_WEB_13cda806-d858-493e-b4aa-f2792ff965dc_medium.jpg"
-          alt="logo"
-        />
+        <img src={BACKGROUND_IMAGE} alt="background" />
       </div>
       <form
         onClick={(e) => e.preventDefault()}
