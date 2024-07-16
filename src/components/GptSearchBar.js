@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import openai from "../utils/openai";
 import { API_OPTIONS } from "../utils/constants";
 import { useDispatch } from "react-redux";
@@ -7,6 +7,7 @@ import { addGptMoviesResults } from "../redux/gptSearchSlice";
 const GptSearchBar = () => {
   const searchText = useRef(null);
   const dispatch = useDispatch();
+  const [error, setError] = useState("");
 
   //This function will take and search movie in TMDB database
   const searchMovieTmdb = async (movieName) => {
@@ -15,8 +16,27 @@ const GptSearchBar = () => {
       API_OPTIONS
     );
     const json = await data.json();
+
     return json.results;
   };
+
+  if (error) {
+    const searchMovieTmdbByName = async (movieName) => {
+      const data = await fetch(
+        `https://api.themoviedb.org/3/search/movie?query=${movieName}&include_adult=false&language=en-US&page=1`,
+        API_OPTIONS
+      );
+      const json = await data.json();
+
+      dispatch(
+        addGptMoviesResults({
+          moviesName: searchText.current.value,
+          moviesData: json.results,
+        })
+      );
+    };
+    searchMovieTmdbByName();
+  }
 
   const handleGptSearch = async () => {
     const gptQuery =
@@ -36,8 +56,14 @@ const GptSearchBar = () => {
         searchMovieTmdb(movie)
       );
       const resultTmdb = await Promise.all(promiseDataArray);
-      dispatch(addGptMoviesResults(resultTmdb));
-    } catch (error) {
+      dispatch(
+        addGptMoviesResults({
+          moviesName: getMoviesName,
+          moviesData: resultTmdb,
+        })
+      );
+    } catch (e) {
+      setError(e);
       console.log(error, "eerpr");
     }
   };
