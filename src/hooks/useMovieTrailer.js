@@ -11,16 +11,16 @@ const useMovieTrailer = (id) => {
       API_OPTIONS
     );
     const result = await data.json();
-    const filterTrailerData = result.results.filter(
+    const filterTrailerData = result?.results?.filter(
       (video) => video.type === "Teaser"
     );
 
-    const filterTeaserData = result.results.filter(
+    const filterTeaserData = result?.results?.filter(
       (video) => video.type === "Trailer"
     );
-    const trailer = filterTrailerData.length
-      ? filterTrailerData[0]
-      : filterTeaserData[0];
+    const trailer = filterTrailerData?.length
+      ? filterTrailerData?.[0]
+      : filterTeaserData?.[0];
     dispatch(addNewTrailer(trailer));
   };
 
